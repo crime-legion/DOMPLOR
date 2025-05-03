@@ -8,8 +8,8 @@ import urllib.request
 from datetime import datetime
 
 # ===== НАСТРОЙКИ ===== #
-THREADS = 10000                     # 💀 Количество потоков
-ATTACK_DURATION = 300              # ⏱️ Длительность атаки (сек)
+THREADS = 100000                     # 💀 Количество потоков
+ATTACK_DURATION = 3000             # ⏱️ Длительность атаки (сек)
 USE_PROXIES = False                # 🌐 Использовать прокси (True/False)
 # ==================== #
 
